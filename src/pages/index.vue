@@ -9,77 +9,120 @@ const mobile = breakpoints.smaller('sm')
 
 const isFormSubmitted = ref(false)
 
+const isNumberInputBlurred = ref(false)
+
 const nameInputEl = ref(null)
+const numberInputEl = ref(null)
+const monthInputEl = ref(null)
+const yearInputEl = ref(null)
+const cvcInputEl = ref(null)
 const isNameValid = ref(true)
 
-// const validateName = (value) => {
-//   if (!value) {
-//     isNameValid.value = false
-//     // nameInputEl.value.focus()
-//     return 'Name is required'
-//   }
-
-//   return true
-// }
-
-// const validateNumber = (value) => {
-//   if (!value)
-//     return 'Card number is required'
-
-//   if (value.toString().length !== 16)
-//     return 'Card number must be 16 digits'
-
-//   return true
-// }
+// onMounted(async () => {
+//   await nextTick(() => nameInputEl.value.style.borderColor = 'green')
+// })
 
 const mySchema = {
   name(value) {
-    if (!value) {
-      isNameValid.value = false
-
+    if (value === '' || value === null) {
+      nameInputEl.value.style.borderColor = 'red'
+      nameInputEl.value.style.borderWidth = '1.5px'
       return 'Name is required'
     }
+    if (value === undefined)
+      return 'Name is required'
+
+    nameInputEl.value.style.borderColor = '#9ca3af'
+    nameInputEl.value.style.borderWidth = '1px'
     return true
   },
   number(value) {
-    if (!value)
+    if (value === '' || value === null) {
+      numberInputEl.value.style.borderColor = 'red'
+      numberInputEl.value.style.borderWidth = '1.5px'
+
+      return 'Card number is required'
+    }
+
+    if (value === undefined)
       return 'Card number is required'
 
-    if (value.toString().length !== 16)
+    if (value.toString().length !== 16) {
+      numberInputEl.value.style.borderColor = 'red'
+      numberInputEl.value.style.borderWidth = '1.5px'
       return 'Card number must be 16 digits'
+    }
+    numberInputEl.value.style.borderColor = '#9ca3af'
+    numberInputEl.value.style.borderWidth = '1px'
 
     return true
   },
   month(value) {
-    if (!value)
+    if (value === '' || value === null) {
+      monthInputEl.value.style.borderColor = 'red'
+      monthInputEl.value.style.borderWidth = '1.5px'
+      return 'Month is required'
+    }
+    if (value === undefined)
       return 'Month is required'
 
-    if (value.toString().length !== 2)
+    if (value.toString().length !== 2) {
+      monthInputEl.value.style.borderColor = 'red'
+      monthInputEl.value.style.borderWidth = '1.5px'
       return 'Month must be 2 digits'
+    }
+    monthInputEl.value.style.borderColor = '#9ca3af'
+    monthInputEl.value.style.borderWidth = '1px'
 
     return true
   },
   year(value) {
-    if (!value)
+    if (value === '' || value === null) {
+      yearInputEl.value.style.borderWidth = '1.5px'
+      yearInputEl.value.style.borderColor = 'red'
+      return 'Year is required'
+    }
+
+    if (value === undefined)
       return 'Year is required'
 
-    if (value.toString().length !== 2)
+    if (value.toString().length !== 2) {
+      yearInputEl.value.style.borderWidth = '1.5px'
+      yearInputEl.value.style.borderColor = 'red'
+
       return 'Year must be 2 digits'
+    }
+    yearInputEl.value.style.borderColor = '#9ca3af'
+    yearInputEl.value.style.borderWidth = '1px'
 
     return true
   },
   cvc(value) {
-    if (!value)
+    if (value === '' || value === null) {
+      cvcInputEl.value.style.borderWidth = '1.5px'
+      cvcInputEl.value.style.borderColor = 'red'
+
+      return 'CVC is required'
+    }
+
+    if (value === undefined)
       return 'CVC is required'
 
-    if (value.toString().length !== 3)
+    if (value.toString().length !== 3) {
+      cvcInputEl.value.style.borderWidth = '1.5px'
+      cvcInputEl.value.style.borderColor = 'red'
+
       return 'CVC must be 3 digits'
+    }
+
+    cvcInputEl.value.style.borderColor = '#9ca3af'
+    cvcInputEl.value.style.borderWidth = '1px'
 
     return true
   },
 }
 const { handleSubmit } = useForm({ validationSchema: mySchema })
-const { value, errorMessage } = useField('name')
+const { value, errorMessage, handleChange } = useField('name')
 const { value: numberValue, errorMessage: numberErrorMessage, handleChange: numberHandleChange } = useField('number')
 const { value: monthValue, errorMessage: monthErrorMessage, handleChange: monthHandleChange } = useField('month')
 const { value: yearValue, errorMessage: yearErrorMessage } = useField('year')
@@ -87,7 +130,24 @@ const { value: cvcValue, errorMessage: cvcErrorMessage } = useField('cvc')
 
 const onSubmit = handleSubmit((values) => {
   console.log('values', values)
+  isFormSubmitted.value = true
 })
+
+const handleNumberBlur = (event) => {
+  numberValue.value = event.target.value
+  // turn on flag for @input
+  isNumberInputBlurred.value = true
+}
+
+const numberHandleInput = (event) => {
+  if (isNumberInputBlurred.value)
+    numberValue.value = event.target.value
+}
+
+const handleContinue = () => {
+  isFormSubmitted.value = false
+  value.value = ''
+}
 </script>
 
 <template>
@@ -163,7 +223,7 @@ const onSubmit = handleSubmit((values) => {
       </p>
       <input
         ref="nameInputEl"
-        v-model="value"
+        :value="value"
         class="w-[100%]"
         name="name"
         placeholder="e.g. Jane Appleseed"
@@ -176,13 +236,16 @@ const onSubmit = handleSubmit((values) => {
         px-4
         py-2
         rounded-lg
+        @blur="value = $event.target.value"
+        @change="handleChange"
       >
-      <span text-xs text-red-600>{{ errorMessage }}</span>
+      <span text-xs text-red-500>{{ errorMessage }}</span>
 
       <p text-xs font-bold mt-5 mb-2>
         CARD NUMBER
       </p>
       <input
+        ref="numberInputEl"
         :value="numberValue"
         class="w-[100%]"
         name="number"
@@ -191,13 +254,17 @@ const onSubmit = handleSubmit((values) => {
         border-1
         border-gray-400
         px-4
+        focus:outline-0
+        focus:ring-1
+        focus:ring-violet-600
 
         py-2
         rounded-lg
-        @blur="numberValue = $event.target.value"
+        @blur="handleNumberBlur"
         @change="numberHandleChange"
+        @input="numberHandleInput"
       >
-      <span text-xs text-red-600>{{ numberErrorMessage }}</span>
+      <span text-xs text-red-500>{{ numberErrorMessage }}</span>
 
       <!-- flexbox bottom row -->
       <div flex gap-3 mt-5>
@@ -207,6 +274,7 @@ const onSubmit = handleSubmit((values) => {
           </p>
           <div flex gap-2>
             <input
+              ref="monthInputEl"
               :value="monthValue"
               class="w-[50%]"
               name="month"
@@ -219,10 +287,15 @@ const onSubmit = handleSubmit((values) => {
               py-2
               rounded-lg
               sm:px-3
+              focus:outline-0
+              focus:ring-1
+              focus:ring-violet-600
+
               @blur="monthValue = $event.target.value"
               @change="monthHandleChange"
             >
             <input
+              ref="yearInputEl"
               :value="yearValue"
               class="w-[50%]"
               name="year"
@@ -230,6 +303,10 @@ const onSubmit = handleSubmit((values) => {
               type="number"
               border-1
               border-gray-400
+              focus:outline-0
+              focus:ring-1
+              focus:ring-violet-600
+
               px-4
               py-2
               rounded-lg
@@ -243,6 +320,7 @@ const onSubmit = handleSubmit((values) => {
             CVC
           </p>
           <input
+            ref="cvcInputEl"
             :value="cvcValue"
             name="cvc"
             placeholder="e.g. 123"
@@ -251,6 +329,10 @@ const onSubmit = handleSubmit((values) => {
             border-gray-400
             px-4
             py-2
+            focus:outline-0
+            focus:ring-1
+            focus:ring-violet-600
+
             rounded-lg
             w-full
             @blur="cvcValue = $event.target.value"
@@ -258,9 +340,9 @@ const onSubmit = handleSubmit((values) => {
           >
         </div>
       </div>
-      <span mt-1 block text-xs text-red-600>{{ monthErrorMessage }}</span>
-      <span text-xs block mt-1 text-red-600>{{ yearErrorMessage }}</span>
-      <span text-xs block mt-1 text-red-600>{{ cvcErrorMessage }}</span>
+      <span mt-1 block text-xs text-red-500>{{ monthErrorMessage }}</span>
+      <span text-xs block mt-1 text-red-500>{{ yearErrorMessage }}</span>
+      <span text-xs block mt-1 text-red-500>{{ cvcErrorMessage }}</span>
 
       <div>
         <button type="submit" mt-7 w-full rounded-lg dark:bg-violet-600 bg-black text-white py-4>
@@ -284,7 +366,7 @@ const onSubmit = handleSubmit((values) => {
         </p>
       </div>
       <div>
-        <button w-full rounded-lg dark:bg-violet-600 bg-black text-white py-4 @click="isFormSubmitted = !isFormSubmitted">
+        <button w-full rounded-lg dark:bg-violet-600 bg-black text-white py-4 @click="handleContinue">
           Continue
         </button>
       </div>
