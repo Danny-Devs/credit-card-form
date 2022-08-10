@@ -155,8 +155,8 @@ const handleContinue = () => {
     <!-- light/dark toggle -->
     <div flex justify-end mb-5>
       <div @click="toggleDark()">
-        <div v-if="isDark" i-carbon-sun />
-        <div v-else text-white i-carbon-moon />
+        <div v-if="isDark" i-carbon-sun sm:text-dark dark:text-white/>
+        <div v-else text-white sm:text-dark dark:text-white i-carbon-moon />
       </div>
     </div>
 
