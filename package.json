@@ -19,6 +19,7 @@
     "@vueuse/head": "^0.7.9",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.17",
+    "vee-validate": "^4.6.4",
     "vue": "^3.2.37",
     "vue-demi": "^0.13.6",
     "vue-i18n": "^9.2.2",

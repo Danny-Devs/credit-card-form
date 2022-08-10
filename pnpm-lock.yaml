@@ -27,6 +27,7 @@ specifiers:
   unocss: ^0.45.5
   unplugin-auto-import: ^0.11.0
   unplugin-vue-components: ^0.22.0
+  vee-validate: ^4.6.4
   vite: ^3.0.4
   vite-plugin-inspect: ^0.6.0
   vite-plugin-pages: ^0.25.0
@@ -47,6 +48,7 @@ dependencies:
   '@vueuse/head': 0.7.9_vue@3.2.37
   nprogress: 0.2.0
   pinia: 2.0.17_j6bzmzd4ujpabbp5objtwxyjp4
+  vee-validate: 4.6.4_vue@3.2.37
   vue: 3.2.37
   vue-demi: 0.13.6_vue@3.2.37
   vue-i18n: 9.2.2_vue@3.2.37
@@ -7908,6 +7910,15 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
     dev: true
+
+  /vee-validate/4.6.4_vue@3.2.37:
+    resolution: {integrity: sha512-40l/fvtz450zTGf0b2/9pz6c6ADBAoC7EquhJ1Zq6fIknWmiLEz8K+a97WmvCkgR/q56H/Hww5T6iMDFp3lrkg==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      '@vue/devtools-api': 6.2.1
+      vue: 3.2.37
+    dev: false
 
   /verror/1.10.0:
     resolution: {integrity: sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA=}
