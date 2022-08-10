@@ -1,5 +1,5 @@
 <script setup>
-import { ErrorMessage, Field, Form } from 'vee-validate'
+import { useField, useForm } from 'vee-validate'
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
@@ -9,11 +9,85 @@ const mobile = breakpoints.smaller('sm')
 
 const isFormSubmitted = ref(false)
 
-const cardholderName = ref(null)
-const cardNumber = ref(null)
-const month = ref(null)
-const year = ref(null)
-const cvc = ref(null)
+const nameInputEl = ref(null)
+const isNameValid = ref(true)
+
+// const validateName = (value) => {
+//   if (!value) {
+//     isNameValid.value = false
+//     // nameInputEl.value.focus()
+//     return 'Name is required'
+//   }
+
+//   return true
+// }
+
+// const validateNumber = (value) => {
+//   if (!value)
+//     return 'Card number is required'
+
+//   if (value.toString().length !== 16)
+//     return 'Card number must be 16 digits'
+
+//   return true
+// }
+
+const mySchema = {
+  name(value) {
+    if (!value) {
+      isNameValid.value = false
+
+      return 'Name is required'
+    }
+    return true
+  },
+  number(value) {
+    if (!value)
+      return 'Card number is required'
+
+    if (value.toString().length !== 16)
+      return 'Card number must be 16 digits'
+
+    return true
+  },
+  month(value) {
+    if (!value)
+      return 'Month is required'
+
+    if (value.toString().length !== 2)
+      return 'Month must be 2 digits'
+
+    return true
+  },
+  year(value) {
+    if (!value)
+      return 'Year is required'
+
+    if (value.toString().length !== 2)
+      return 'Year must be 2 digits'
+
+    return true
+  },
+  cvc(value) {
+    if (!value)
+      return 'CVC is required'
+
+    if (value.toString().length !== 3)
+      return 'CVC must be 3 digits'
+
+    return true
+  },
+}
+const { handleSubmit } = useForm({ validationSchema: mySchema })
+const { value, errorMessage } = useField('name')
+const { value: numberValue, errorMessage: numberErrorMessage, handleChange: numberHandleChange } = useField('number')
+const { value: monthValue, errorMessage: monthErrorMessage, handleChange: monthHandleChange } = useField('month')
+const { value: yearValue, errorMessage: yearErrorMessage } = useField('year')
+const { value: cvcValue, errorMessage: cvcErrorMessage } = useField('cvc')
+
+const onSubmit = handleSubmit((values) => {
+  console.log('values', values)
+})
 </script>
 
 <template>
@@ -77,37 +151,119 @@ const cvc = ref(null)
     <!-- end card images for desktop -->
 
     <!-- form -->
-    <Form v-if="!isFormSubmitted" tracking-widest mt-30 class="sm:ml-[58%] md:ml-[51%] lg:ml-[42%] xl:ml-[34%] md:mr-[3%] lg:mr-[15%] xl:mr-[20%]" @submit="handleSubmit">
+    <form
+      v-if="!isFormSubmitted"
+      class="sm:ml-[58%] md:ml-[51%] lg:ml-[42%] xl:ml-[34%] md:mr-[3%] lg:mr-[15%] xl:mr-[20%]"
+      mt-30
+      tracking-widest
+      @submit="onSubmit"
+    >
       <p text-xs font-bold mb-2>
         CARDHOLDER NAME
       </p>
-      <Field v-model="cardholderName" name="cardholder-name" mb-5 border-1 border-gray-400 px-4 py-2 rounded-lg type="text" class="w-[100%]" placeholder="e.g. Jane Appleseed" />
+      <input
+        ref="nameInputEl"
+        v-model="value"
+        class="w-[100%]"
+        name="name"
+        placeholder="e.g. Jane Appleseed"
+        type="text"
+        border-1
+        border-gray-400
+        focus:outline-0
+        focus:ring-1
+        focus:ring-violet-600
+        px-4
+        py-2
+        rounded-lg
+      >
+      <span text-xs text-red-600>{{ errorMessage }}</span>
 
-      <p text-xs font-bold mb-2>
+      <p text-xs font-bold mt-5 mb-2>
         CARD NUMBER
       </p>
-      <Field v-model="cardNumber" name="card-number" type="number" class="w-[100%]" mb-5 border-1 border-gray-400 px-4 py-2 rounded-lg placeholder="e.g. 1234 5678 9123 0000" />
+      <input
+        :value="numberValue"
+        class="w-[100%]"
+        name="number"
+        placeholder="e.g. 1234 5678 9123 0000"
+        type="number"
+        border-1
+        border-gray-400
+        px-4
+
+        py-2
+        rounded-lg
+        @blur="numberValue = $event.target.value"
+        @change="numberHandleChange"
+      >
+      <span text-xs text-red-600>{{ numberErrorMessage }}</span>
+
       <!-- flexbox bottom row -->
-      <div flex gap-3 mb-7>
+      <div flex gap-3 mt-5>
         <div class="basis-1/2">
           <p text-xs font-bold mb-2>
             EXP. DATE (MM/YY)
           </p>
           <div flex gap-2>
-            <Field v-model="month" name="month" type="number" class="w-[50%]" placeholder="MM" border-1 border-gray-400 px-4 sm:px-3 md:px-4 py-2 rounded-lg />
-            <Field v-model="year" name="year" type="number" class="w-[50%]" placeholder="YY" border-1 border-gray-400 px-4 py-2 rounded-lg />
+            <input
+              :value="monthValue"
+              class="w-[50%]"
+              name="month"
+              placeholder="MM"
+              type="number"
+              border-1
+              border-gray-400
+              md:px-4
+              px-4
+              py-2
+              rounded-lg
+              sm:px-3
+              @blur="monthValue = $event.target.value"
+              @change="monthHandleChange"
+            >
+            <input
+              :value="yearValue"
+              class="w-[50%]"
+              name="year"
+              placeholder="YY"
+              type="number"
+              border-1
+              border-gray-400
+              px-4
+              py-2
+              rounded-lg
+              @blur="yearValue = $event.target.value"
+              @change="yearHandleChange"
+            >
           </div>
         </div>
         <div class="basis-1/2" self-end>
           <p text-xs font-bold mb-2>
             CVC
           </p>
-          <Field v-model="cvc" name="cvc" type="number" w-full placeholder="e.g. 123" border-1 border-gray-400 px-4 py-2 rounded-lg />
+          <input
+            :value="cvcValue"
+            name="cvc"
+            placeholder="e.g. 123"
+            type="number"
+            border-1
+            border-gray-400
+            px-4
+            py-2
+            rounded-lg
+            w-full
+            @blur="cvcValue = $event.target.value"
+            @change="cvcHandleChange"
+          >
         </div>
       </div>
+      <span mt-1 block text-xs text-red-600>{{ monthErrorMessage }}</span>
+      <span text-xs block mt-1 text-red-600>{{ yearErrorMessage }}</span>
+      <span text-xs block mt-1 text-red-600>{{ cvcErrorMessage }}</span>
 
       <div>
-        <button type="submit" w-full rounded-lg dark:bg-violet-600 bg-black text-white py-4>
+        <button type="submit" mt-7 w-full rounded-lg dark:bg-violet-600 bg-black text-white py-4>
           Confirm
         </button>
       </div>
