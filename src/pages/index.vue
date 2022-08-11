@@ -345,7 +345,7 @@ const handleContinue = () => {
       <span text-xs block mt-1 text-red-500>{{ cvcErrorMessage }}</span>
 
       <div>
-        <button type="submit" mt-7 w-full rounded-lg dark:bg-violet-600 bg-black text-white py-4>
+        <button type="submit" mt-7 mb-12 w-full rounded-lg dark:bg-violet-600 bg-black text-white py-4>
           Confirm
         </button>
       </div>
